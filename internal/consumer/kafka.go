@@ -50,7 +50,7 @@ func (c *Consumer) Run(ctx context.Context, tgClient *tg.Client) error {
 			slog.Error("read failed", "error", err)
 			continue
 		}
-		slog.Info("message received", "topic", msg.Topic, "partition", msg.Partition, "offset", msg.Offset, "key", string(msg.Key), "value", string(msg.Key))
+		slog.Info("message received", "topic", msg.Topic, "partition", msg.Partition, "offset", msg.Offset, "key", string(msg.Key), "value", string(msg.Value))
 
 		if err := c.Commit(ctx, msg); err != nil {
 			slog.Error("commit failed", "offset", msg.Offset, "error", err)

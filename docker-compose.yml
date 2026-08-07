@@ -3,11 +3,18 @@ services:
     build:
       context: .
       dockerfile: docker/notifier/Dockerfile
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    networks:
+      - crypto-stream_default
     environment:
-      KAFKA_BROKERS: ${KAFKA_BROKERS:-host.docker.internal:9092}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      KAFKA_BROKERS: ${KAFKA_BROKERS:-kafka:9092}
       KAFKA_TOPIC: ${KAFKA_TOPIC:-volatility.alerts}
       KAFKA_GROUP_ID: ${KAFKA_GROUP_ID:-notifier}
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_TOKEN: ${TELEGRAM_BOT_TOKEN}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
+      TELEGRAM_MAX_RETRIES: ${TELEGRAM_MAX_RETRIES:-3}
+      TELEGRAM_BASE_DELAY: ${TELEGRAM_BASE_DELAY:-2}
+
+networks:
+  crypto-stream_default:
+    external: true
