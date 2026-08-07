@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"strconv"
 	"strings"
@@ -14,9 +15,19 @@ import (
 type Config struct {
 	KafkaConsumer consumer.Config
 	Telegram      tg.Config
+	LogLevel      slog.Level
 }
 
 func Load() (*Config, error) {
+	logLevel, err := getEnv("LOG_LEVEL", func(s string) (slog.Level, error) {
+		var level slog.Level
+		err := level.UnmarshalText([]byte(s))
+		return level, err
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	kafkaBrokers, err := getEnv("KAFKA_BROKERS", func(s string) ([]string, error) {
 		return strings.Split(s, ","), nil
 	})
@@ -66,6 +77,7 @@ func Load() (*Config, error) {
 	}
 
 	return &Config{
+		LogLevel: logLevel,
 		KafkaConsumer: consumer.Config{
 			Brokers: kafkaBrokers,
 			Topic:   kafkaTopic,
