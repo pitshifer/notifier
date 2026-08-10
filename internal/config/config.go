@@ -8,12 +8,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pitshifer/notifier/internal/consumer"
+	kafka "github.com/pitshifer/notifier/internal/kafka"
 	"github.com/pitshifer/notifier/internal/tg"
 )
 
 type Config struct {
-	KafkaConsumer consumer.Config
+	KafkaConsumer kafka.Config
 	Telegram      tg.Config
 	LogLevel      slog.Level
 }
@@ -78,7 +78,7 @@ func Load() (*Config, error) {
 
 	return &Config{
 		LogLevel: logLevel,
-		KafkaConsumer: consumer.Config{
+		KafkaConsumer: kafka.Config{
 			Brokers: kafkaBrokers,
 			Topic:   kafkaTopic,
 			GroupID: kafkaGroupID,

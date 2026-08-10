@@ -9,7 +9,7 @@ import (
 	"syscall"
 
 	"github.com/pitshifer/notifier/internal/config"
-	"github.com/pitshifer/notifier/internal/consumer"
+	kafka "github.com/pitshifer/notifier/internal/kafka"
 	"github.com/pitshifer/notifier/internal/tg"
 )
 
@@ -38,7 +38,7 @@ func main() {
 	slog.Info("Telegram client created")
 
 	// Kafka consumer
-	kafkaConsumer := consumer.NewConsumer(cfg.KafkaConsumer)
+	kafkaConsumer := kafka.NewConsumer(cfg.KafkaConsumer)
 	defer kafkaConsumer.Close()
 	go kafkaConsumer.Run(ctx, tgClient)
 	slog.Info("Kafka consumer started")

@@ -1,4 +1,4 @@
-package consumer
+package kafka
 
 import (
 	"context"
@@ -11,22 +11,23 @@ import (
 
 	"github.com/pitshifer/notifier/internal/model"
 	"github.com/pitshifer/notifier/internal/tg"
-	"github.com/segmentio/kafka-go"
+	kfk "github.com/segmentio/kafka-go"
 )
 
 type Consumer struct {
-	reader *kafka.Reader
+	reader *kfk.Reader
 }
 
 type Config struct {
-	Brokers []string
-	Topic   string
-	GroupID string
+	Brokers  []string
+	Topic    string
+	TopicDLQ string
+	GroupID  string
 }
 
 func NewConsumer(config Config) *Consumer {
 	return &Consumer{
-		reader: kafka.NewReader(kafka.ReaderConfig{
+		reader: kfk.NewReader(kfk.ReaderConfig{
 			Brokers: config.Brokers,
 			Topic:   config.Topic,
 			GroupID: config.GroupID,
@@ -58,7 +59,7 @@ func (c *Consumer) Run(ctx context.Context, tgClient *tg.Client) error {
 			continue
 		}
 		if err := tgClient.Send(ctx, formatAlert(alert)); err != nil {
-			slog.Error("telegram send failed - message lost", "offset", msg.Offset, "error", err)
+			slog.Error("telegram send failed", "offset", msg.Offset, "error", err)
 			continue
 		}
 		slog.Info("notification sent", "offset", msg.Offset)
@@ -71,11 +72,11 @@ func (c *Consumer) Run(ctx context.Context, tgClient *tg.Client) error {
 	}
 }
 
-func (c *Consumer) ReadMessage(ctx context.Context) (kafka.Message, error) {
+func (c *Consumer) ReadMessage(ctx context.Context) (kfk.Message, error) {
 	return c.reader.ReadMessage(ctx)
 }
 
-func (c *Consumer) Commit(ctx context.Context, msg kafka.Message) error {
+func (c *Consumer) Commit(ctx context.Context, msg kfk.Message) error {
 	return c.reader.CommitMessages(ctx, msg)
 }
 
