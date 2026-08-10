@@ -21,6 +21,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to load config: %v", err)
 	}
+	slog.Info("config loaded")
 
 	loggerHandler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: cfg.LogLevel,
@@ -34,11 +35,16 @@ func main() {
 		slog.Error("failed to create Telegram client", "error", err)
 		os.Exit(1)
 	}
+	slog.Info("Telegram client created")
 
 	// Kafka consumer
 	kafkaConsumer := consumer.NewConsumer(cfg.KafkaConsumer)
 	defer kafkaConsumer.Close()
 	go kafkaConsumer.Run(ctx, tgClient)
+	slog.Info("Kafka consumer started")
+
+	slog.Info("notifier started")
 
 	<-ctx.Done()
+	slog.Info("notifier stopped")
 }
