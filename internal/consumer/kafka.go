@@ -42,7 +42,7 @@ func (c *Consumer) Run(ctx context.Context, tgClient *tg.Client) error {
 		default:
 		}
 
-		msg, err := c.ReadMessage(ctx)
+		msg, err := c.reader.FetchMessage(ctx)
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				return nil
