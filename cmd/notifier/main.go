@@ -21,7 +21,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to load config: %v", err)
 	}
-	slog.Info("config loaded")
+	log.Println("config loaded")
 
 	loggerHandler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: cfg.LogLevel,
