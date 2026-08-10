@@ -52,24 +52,22 @@ func (c *Consumer) Run(ctx context.Context, tgClient *tg.Client) error {
 		}
 		slog.Info("message received", "topic", msg.Topic, "partition", msg.Partition, "offset", msg.Offset, "key", string(msg.Key), "value", string(msg.Value))
 
-		if err := c.Commit(ctx, msg); err != nil {
-			slog.Error("commit failed", "offset", msg.Offset, "error", err)
-			continue
-		}
-		slog.Info("offset commited", "offset", msg.Offset)
-
 		var alert model.VolatilityAlert
 		if err := json.Unmarshal(msg.Value, &alert); err != nil {
 			slog.Error("parse failed", "offset", msg.Offset, "error", err)
 			continue
 		}
-
 		if err := tgClient.Send(ctx, formatAlert(alert)); err != nil {
 			slog.Error("telegram send failed - message lost", "offset", msg.Offset, "error", err)
 			continue
 		}
-
 		slog.Info("notification sent", "offset", msg.Offset)
+
+		if err := c.Commit(ctx, msg); err != nil {
+			slog.Error("commit failed", "offset", msg.Offset, "error", err)
+			continue
+		}
+		slog.Info("offset commited", "offset", msg.Offset)
 	}
 }
 
