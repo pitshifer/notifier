@@ -40,6 +40,11 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 
+	kafkaTopicDLQ, err := getEnv("KAFKA_TOPIC_DLQ", identity)
+	if err != nil {
+		return nil, err
+	}
+
 	kafkaGroupID, err := getEnv("KAFKA_GROUP_ID", identity)
 	if err != nil {
 		return nil, err
@@ -79,9 +84,10 @@ func Load() (*Config, error) {
 	return &Config{
 		LogLevel: logLevel,
 		Kafka: kafka.Config{
-			Brokers: kafkaBrokers,
-			Topic:   kafkaTopic,
-			GroupID: kafkaGroupID,
+			Brokers:  kafkaBrokers,
+			Topic:    kafkaTopic,
+			TopicDLQ: kafkaTopicDLQ,
+			GroupID:  kafkaGroupID,
 		},
 		Telegram: tg.Config{
 			Token:      tgToken,
