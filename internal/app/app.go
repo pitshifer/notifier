@@ -55,7 +55,7 @@ func (s *Service) Run(ctx context.Context) error {
 			dlqEnvelope := model.NewDLQEnvelope(msg.Value, msg.Offset, string(msg.Key), err.Error())
 			dlqErr := s.producer.Send(ctx, dlqEnvelope)
 			if dlqErr != nil {
-				slog.Error("failed to send message to DQL queque", "message", msg.Value, "offset", msg.Offset, "error", dlqErr)
+				slog.Error("failed to send message to DQL queque", "message", string(msg.Value), "offset", msg.Offset, "error", dlqErr)
 				continue
 			}
 			slog.Warn("message routed to DLQ", "offset", msg.Offset)
