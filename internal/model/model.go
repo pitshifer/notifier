@@ -2,6 +2,8 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -17,5 +19,24 @@ type DLQEnvelope struct {
 	OriginalKey    string          `json:"original_key"`
 	Payload        json.RawMessage `json:"payload"`
 	Error          string          `json:"error"`
-	FailedAt       time.Time       `json:"failed_aat"`
+	FailedAt       time.Time       `json:"failed_at"`
+}
+
+func (va *VolatilityAlert) FormatAlert() string {
+	return fmt.Sprintf("⚠ %s\nvolatility: %.2f%% (threshold: %.2f%%)\n%s",
+		strings.ToUpper(va.Symbol),
+		va.Volatility*100,
+		va.Threshold*100,
+		va.Timestamp.Format(time.RFC3339),
+	)
+}
+
+func NewDLQEnvelope(rawPayload []byte, offset int64, key, errMsg string) DLQEnvelope {
+	return DLQEnvelope{
+		OriginalOffset: offset,
+		OriginalKey:    key,
+		Payload:        rawPayload,
+		Error:          errMsg,
+		FailedAt:       time.Now(),
+	}
 }

@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/pitshifer/notifier/internal/app"
 	"github.com/pitshifer/notifier/internal/config"
 	kafka "github.com/pitshifer/notifier/internal/kafka"
 	"github.com/pitshifer/notifier/internal/tg"
@@ -38,10 +39,18 @@ func main() {
 	slog.Info("Telegram client created")
 
 	// Kafka consumer
-	kafkaConsumer := kafka.NewConsumer(cfg.KafkaConsumer)
+	kafkaConsumer := kafka.NewConsumer(cfg.Kafka)
 	defer kafkaConsumer.Close()
-	go kafkaConsumer.Run(ctx, tgClient)
-	slog.Info("Kafka consumer started")
+	slog.Info("Kafka consumer created")
+
+	// Kafka producer
+	kafkaProducer := kafka.NewProducer(cfg.Kafka)
+	defer kafkaProducer.Close()
+	slog.Info("Kafka producer created")
+
+	app := app.New(kafkaConsumer, kafkaProducer, tgClient)
+	go app.Run(ctx)
+	slog.Info("Application started")
 
 	slog.Info("notifier started")
 

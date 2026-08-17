@@ -13,9 +13,9 @@ import (
 )
 
 type Config struct {
-	KafkaConsumer kafka.Config
-	Telegram      tg.Config
-	LogLevel      slog.Level
+	Kafka    kafka.Config
+	Telegram tg.Config
+	LogLevel slog.Level
 }
 
 func Load() (*Config, error) {
@@ -78,7 +78,7 @@ func Load() (*Config, error) {
 
 	return &Config{
 		LogLevel: logLevel,
-		KafkaConsumer: kafka.Config{
+		Kafka: kafka.Config{
 			Brokers: kafkaBrokers,
 			Topic:   kafkaTopic,
 			GroupID: kafkaGroupID,
