@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: docker/notifier/Dockerfile
     networks:
-      - crypto-stream_default
+      - kafka-net
     volumes:
       - dedup-data:/app/data
     environment:
@@ -20,7 +20,7 @@ services:
       DEDUP_DB_PATH: ${DEDUP_DB_PATH:-/app/data/dedup.db}
 
 networks:
-  crypto-stream_default:
+  kafka-net:
     external: true
 
 volumes:
