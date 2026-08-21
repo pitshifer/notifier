@@ -13,9 +13,10 @@ import (
 )
 
 type Config struct {
-	Kafka    kafka.Config
-	Telegram tg.Config
-	LogLevel slog.Level
+	Kafka       kafka.Config
+	Telegram    tg.Config
+	LogLevel    slog.Level
+	DedupDBPath string
 }
 
 func Load() (*Config, error) {
@@ -81,8 +82,14 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 
+	dedupDBPath, err := getEnv("DEDUP_DB_PATH", identity)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Config{
-		LogLevel: logLevel,
+		LogLevel:    logLevel,
+		DedupDBPath: dedupDBPath,
 		Kafka: kafka.Config{
 			Brokers:  kafkaBrokers,
 			Topic:    kafkaTopic,

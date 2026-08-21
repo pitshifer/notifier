@@ -12,6 +12,7 @@ import (
 	"github.com/pitshifer/notifier/internal/config"
 	kafka "github.com/pitshifer/notifier/internal/kafka"
 	"github.com/pitshifer/notifier/internal/tg"
+	"go.etcd.io/bbolt"
 )
 
 func main() {
@@ -38,6 +39,14 @@ func main() {
 	}
 	slog.Info("Telegram client created")
 
+	// bbolt storage
+	dedupDB, err := bbolt.Open(cfg.DedupDBPath, 0600, nil)
+	if err != nil {
+		slog.Error("failed to open dedup db", "error", err)
+		os.Exit(1)
+	}
+	defer dedupDB.Close()
+
 	// Kafka consumer
 	kafkaConsumer := kafka.NewConsumer(cfg.Kafka)
 	defer kafkaConsumer.Close()
@@ -48,7 +57,7 @@ func main() {
 	defer kafkaProducer.Close()
 	slog.Info("Kafka producer created")
 
-	app := app.New(kafkaConsumer, kafkaProducer, tgClient)
+	app := app.New(kafkaConsumer, kafkaProducer, tgClient, dedupDB)
 	go app.Run(ctx)
 	slog.Info("Application started")
 
