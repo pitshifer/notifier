@@ -61,7 +61,7 @@ func main() {
 	go app.Run(ctx)
 	slog.Info("Application started")
 
-	slog.Info("notifier started")
+	slog.Info("Notifier started")
 
 	<-ctx.Done()
 	slog.Info("notifier stopped")

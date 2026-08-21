@@ -33,7 +33,6 @@ func NewClient(cfg Config) (*Client, error) {
 }
 
 func (c *Client) Send(ctx context.Context, message string) error {
-
 	msg := tgbotapi.NewMessage(c.cfg.ChatID, message)
 	var lastErr error
 	for attempt := 0; attempt <= c.cfg.MaxRetries; attempt++ {
@@ -46,10 +45,11 @@ func (c *Client) Send(ctx context.Context, message string) error {
 			}
 		}
 
-		_, err := c.bot.Send(msg)
-		if err == nil {
+		_, sendErr := c.bot.Send(msg)
+		if sendErr == nil {
 			return nil
 		}
+		lastErr = sendErr
 	}
 
 	return fmt.Errorf("telegram: send message failed after %d attempts: %w", c.cfg.MaxRetries+1, lastErr)
